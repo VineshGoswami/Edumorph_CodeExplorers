@@ -1,0 +1,27 @@
+
+## `.gitignore`
+```gitignore
+# Node
+node_modules/
+npm-debug.log*
+yarn.lock
+pnpm-lock.yaml
+
+# env
+*.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+model_registry/**/model.joblib
+model_registry/**/weights.pt
+
+# Build
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db

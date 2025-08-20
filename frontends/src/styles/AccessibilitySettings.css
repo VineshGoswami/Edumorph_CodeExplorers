@@ -1,0 +1,217 @@
+.accessibility-settings {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.accessibility-settings.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.settings-content {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.settings-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #444;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.setting-item {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.setting-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.setting-item input[type="range"] {
+  margin: 0 1rem;
+  width: 150px;
+}
+
+.setting-item select {
+  margin-left: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
+}
+
+.settings-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.save-button {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-button:hover {
+  background-color: #3367d6;
+}
+
+.save-status {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* High contrast mode styles */
+body.high-contrast {
+  background-color: #000;
+  color: #fff;
+}
+
+body.high-contrast .lesson-content,
+body.high-contrast .card,
+body.high-contrast .nav-button,
+body.high-contrast .settings-button,
+body.high-contrast .speech-button {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+body.high-contrast a {
+  color: #ffff00;
+}
+
+body.high-contrast button {
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #fff;
+}
+
+/* Large text mode styles */
+body.large-text {
+  font-size: 1.2rem;
+}
+
+body.large-text h1 {
+  font-size: 2.4rem;
+}
+
+body.large-text h2 {
+  font-size: 2rem;
+}
+
+body.large-text h3 {
+  font-size: 1.8rem;
+}
+
+body.large-text button,
+body.large-text input,
+body.large-text select {
+  font-size: 1.2rem;
+}
+
+/* Reduced motion styles */
+body.reduced-motion * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Simplified UI styles */
+body.simplified-ui .decorative-element,
+body.simplified-ui .non-essential-ui {
+  display: none !important;
+}
+
+body.simplified-ui .content-area {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Enhanced keyboard navigation */
+body.keyboard-nav :focus {
+  outline: 3px solid #4285f4 !important;
+  outline-offset: 2px !important;
+}
+
+body.keyboard-nav button:focus,
+body.keyboard-nav a:focus,
+body.keyboard-nav input:focus,
+body.keyboard-nav select:focus,
+body.keyboard-nav textarea:focus {
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.6) !important;
+}
+
+/* Reading guide styles */
+body.reading-guide {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="0" y="14" width="32" height="4" fill="rgba(255,255,0,0.5)" /></svg>'), auto;
+}
+
+body.reading-guide p,
+body.reading-guide li,
+body.reading-guide h1,
+body.reading-guide h2,
+body.reading-guide h3,
+body.reading-guide h4,
+body.reading-guide h5,
+body.reading-guide h6 {
+  line-height: 2;
+}

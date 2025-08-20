@@ -35,8 +35,11 @@ body {
     repeating-linear-gradient(0deg, transparent, transparent 50px, var(--grid-color) 50px, var(--grid-color) 51px),
     repeating-linear-gradient(90deg, transparent, transparent 50px, var(--grid-color) 50px, var(--grid-color) 51px);
   background-size: cover;
+  background-attachment: fixed;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
 }
 
 body::before {
@@ -55,6 +58,9 @@ body::before {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 /* Loading States */
@@ -180,7 +186,8 @@ small {
   z-index: 2;
   background-image: radial-gradient(rgba(0, 59, 70, 0.3) 1px, transparent 1px);
   background-size: 30px 30px;
-  overflow: auto;
+  background-attachment: fixed;
+  overflow-y: auto;
   max-height: 100vh;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.2);
@@ -442,6 +449,8 @@ small {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  overflow: auto;
+
 }
 
 .dashboard-header {

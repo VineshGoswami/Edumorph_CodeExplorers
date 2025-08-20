@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
 
 // Components
@@ -7,50 +7,44 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import LessonPage from './components/LessonPage';
+import TeacherDashboard from './components/TeacherDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import OfflineIndicator from './components/OfflineIndicator';
+import AccessibilitySettings from './components/AccessibilitySettings';
+import CulturalAdaptationSettings from './components/CulturalAdaptationSettings';
+import TranslationSettings from './components/TranslationSettings';
+import UserProfile from './components/UserProfile';
+import FAQ from './components/FAQ';
+import Contact from './components/Contact';
+import About from './components/About';
+import Help from './components/Help';
+import Navigation from './components/Navigation';
+import FloatingBackground from './components/FloatingBackground';
 
-// API
-import { getCurrentUser } from './api';
+// Contexts
+import { OfflineProvider } from './contexts/OfflineContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      // Fetch current user data
-      getCurrentUser()
-        .then(response => {
-          setUser(response.data);
-          setIsAuthenticated(true);
-        })
-        .catch(error => {
-          console.error('Authentication error:', error);
-          // Clear invalid token
-          localStorage.removeItem('token');
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
+function AppContent() {
+  const { user, isAuthenticated, isLoading, login, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
+    login(userData.email, userData.password);
   };
 
   const handleLogout = () => {
-    // Clear token and user data
-    localStorage.removeItem('token');
-    setUser(null);
-    setIsAuthenticated(false);
+    logout();
   };
 
   if (isLoading) {
@@ -58,45 +52,90 @@ function App() {
   }
 
   return (
-    <Router>
+    <OfflineProvider>
       <div className="App">
-        <Routes>
-          {/* Public routes */}
-          <Route 
-            path="/login" 
-            element={
-              isAuthenticated ? 
-                <Navigate to="/dashboard" replace /> : 
-                <Login onLogin={handleLogin} />
-            } 
-          />
-          <Route 
-            path="/register" 
-            element={
-              isAuthenticated ? 
-                <Navigate to="/dashboard" replace /> : 
-                <Register onLogin={handleLogin} />
-            } 
-          />
-          
-          {/* Routes accessible without login */}
-          <Route 
-            path="/dashboard" 
-            element={<Dashboard user={user} />} 
-          />
-          <Route 
-            path="/lessons/:id" 
-            element={<LessonPage />} 
-          />
-          
-          {/* Redirect root to dashboard */}
-          <Route 
-            path="/" 
-            element={<Navigate to="/dashboard" replace />} 
-          />
-        </Routes>
-      </div>
-    </Router>
+        <FloatingBackground />
+        <OfflineIndicator />
+        <Navigation />
+          <Routes>
+            {/* Public routes */}
+            <Route 
+              path="/login" 
+              element={
+                isAuthenticated ? 
+                  <Navigate to="/dashboard" replace /> : 
+                  <Login onLogin={handleLogin} />
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                isAuthenticated ? 
+                  <Navigate to="/dashboard" replace /> : 
+                  <Register onLogin={handleLogin} />
+              } 
+            />
+            
+            {/* Routes accessible without login */}
+            <Route 
+              path="/dashboard" 
+              element={<Dashboard user={user} />} 
+            />
+            <Route 
+              path="/lessons/:id" 
+              element={<LessonPage />} 
+            />
+            <Route 
+              path="/teacher-dashboard" 
+              element={<TeacherDashboard user={user} />} 
+            />
+            
+            {/* User Profile */}
+            <Route 
+              path="/profile" 
+              element={<UserProfile />} 
+            />
+            
+            {/* Settings Routes */}
+            <Route 
+              path="/settings/accessibility" 
+              element={<AccessibilitySettings onClose={() => window.history.back()} />} 
+            />
+            <Route 
+              path="/settings/cultural" 
+              element={<CulturalAdaptationSettings userPreferences={user?.preferences} onPreferencesUpdated={() => {}} />} 
+            />
+            <Route 
+              path="/settings/translation" 
+              element={<TranslationSettings onClose={() => window.history.back()} />} 
+            />
+            
+            {/* Information Pages */}
+            <Route 
+              path="/faq" 
+              element={<FAQ />} 
+            />
+            <Route 
+              path="/contact" 
+              element={<Contact />} 
+            />
+            <Route 
+              path="/about" 
+              element={<About />} 
+            />
+            <Route 
+              path="/help" 
+              element={<Help />} 
+            />
+            
+            {/* Redirect root to dashboard */}
+            <Route 
+              path="/" 
+              element={<Navigate to="/dashboard" replace />} 
+            />
+          </Routes>
+        </div>
+    </OfflineProvider>
   );
 }
 

@@ -1,0 +1,162 @@
+/* FloatingBackground.css */
+/* Black and sea green theme with floating animation */
+
+:root {
+  --primary-black: #121212;
+  --sea-green: #20B2AA;
+  --sea-green-light: #3CBBB1;
+  --sea-green-dark: #188F89;
+  --text-light: #F5F5F5;
+  --text-dark: #121212;
+  --accent-color: #00CED1;
+}
+
+/* Apply theme to body */
+body.theme-dark-sea {
+  background-color: var(--primary-black);
+  color: var(--text-light);
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Floating background elements */
+.floating-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.floating-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--sea-green-light), var(--sea-green-dark));
+  opacity: 0.2;
+  filter: blur(8px);
+  animation: float-animation 15s infinite ease-in-out;
+}
+
+/* Generate multiple bubbles with different sizes and positions */
+.floating-bubble:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: 10%;
+  animation-duration: 25s;
+  animation-delay: 0s;
+}
+
+.floating-bubble:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  top: 60%;
+  left: 20%;
+  animation-duration: 20s;
+  animation-delay: 2s;
+}
+
+.floating-bubble:nth-child(3) {
+  width: 150px;
+  height: 150px;
+  top: 30%;
+  left: 70%;
+  animation-duration: 18s;
+  animation-delay: 1s;
+}
+
+.floating-bubble:nth-child(4) {
+  width: 250px;
+  height: 250px;
+  top: 70%;
+  left: 80%;
+  animation-duration: 22s;
+  animation-delay: 3s;
+}
+
+.floating-bubble:nth-child(5) {
+  width: 180px;
+  height: 180px;
+  top: 40%;
+  left: 40%;
+  animation-duration: 23s;
+  animation-delay: 4s;
+}
+
+/* Floating animation */
+@keyframes float-animation {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5%, 10%) rotate(5deg);
+  }
+  50% {
+    transform: translate(10%, 5%) rotate(10deg);
+  }
+  75% {
+    transform: translate(5%, -5%) rotate(5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* Theme overrides for components */
+body.theme-dark-sea .App {
+  background-color: transparent;
+}
+
+body.theme-dark-sea button {
+  background-color: var(--sea-green);
+  color: var(--text-dark);
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+body.theme-dark-sea button:hover {
+  background-color: var(--sea-green-light);
+}
+
+body.theme-dark-sea input,
+body.theme-dark-sea select,
+body.theme-dark-sea textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--sea-green);
+  color: var(--text-light);
+}
+
+body.theme-dark-sea a {
+  color: var(--sea-green-light);
+  text-decoration: none;
+}
+
+body.theme-dark-sea a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+/* Card and container styling */
+body.theme-dark-sea .card,
+body.theme-dark-sea .container {
+  background-color: rgba(18, 18, 18, 0.7);
+  border: 1px solid var(--sea-green-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Header styling */
+body.theme-dark-sea header {
+  background-color: rgba(18, 18, 18, 0.9);
+  border-bottom: 2px solid var(--sea-green);
+}
+
+/* Footer styling */
+body.theme-dark-sea footer {
+  background-color: rgba(18, 18, 18, 0.9);
+  border-top: 2px solid var(--sea-green);
+}

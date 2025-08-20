@@ -1,0 +1,30 @@
+### Register
+POST http://localhost:4000/api/auth/register
+Content-Type: application/json
+
+{ "name":"Aman","email":"student1@example.com","password":"password123","preferredLanguage":"pa","region":"Punjab","grade":5 }
+
+### Login
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{ "email":"student1@example.com","password":"password123" }
+
+### List lessons (paste token)
+GET http://localhost:4000/api/lessons?grade=5
+Authorization: Bearer {{token}}
+
+### Adapt one lesson (replace LESSON_ID)
+GET http://localhost:4000/api/lessons/adapted/LESSON_ID?language=pa&region=Punjab&grade=5
+Authorization: Bearer {{token}}
+
+### Progress
+POST http://localhost:4000/api/progress
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "lessonId":"LESSON_ID","status":"completed","score":0 }
+
+### Context events
+GET http://localhost:4000/api/context/events
+Authorization: Bearer {{token}}

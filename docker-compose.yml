@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+    volumes: [mongo_data:/data/db]
+
+  ml-service:
+    build: ./ml-service
+    ports: ["8000:8000"]
+
+  mcp-service:
+    build: ./mcp-service
+    ports: ["8100:8100"]
+    environment:
+      - ML_SERVICE_URL=http://ml-service:8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on: [ml-service]
+
+  backend:
+    build: ./backend
+    ports: ["4000:4000"]
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/edumorph
+      - JWT_SECRET=supersecretjwt
+      - ML_SERVICE_URL=http://ml-service:8000
+      - MCP_SERVICE_URL=http://mcp-service:8100
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - TTS_DEFAULT_VOICE=alloy
+      - STT_DEFAULT_LANGUAGE=en-US
+    depends_on: [mongo, ml-service, mcp-service]
+
+  frontend:
+    build: ./frontends
+    ports: ["3000:3000"]
+    environment:
+      - REACT_APP_API=http://localhost:4000/api
+      - REACT_APP_SPEECH_API=http://localhost:4000/api/speech
+      - REACT_APP_ACCESSIBILITY_API=http://localhost:4000/api/accessibility
+      - REACT_APP_ENABLE_OFFLINE_MODE=true
+    depends_on: [backend]
+
+volumes:
+  mongo_data:

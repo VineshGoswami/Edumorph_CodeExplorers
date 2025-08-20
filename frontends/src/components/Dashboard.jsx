@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaBook, FaQuestionCircle, FaHeadset } from 'react-icons/fa';
+import { FaHome, FaBook, FaQuestionCircle, FaHeadset, FaUniversalAccess, FaChalkboardTeacher } from 'react-icons/fa';
+import AccessibilitySettings from './AccessibilitySettings';
 import '../styles/Dashboard.css';
 
 // Mock data for lessons
@@ -76,6 +77,7 @@ const Dashboard = ({ user }) => {
   const [error, setError] = useState('');
   const [userProfile, setUserProfile] = useState(user || mockUser);
   const [activeTab, setActiveTab] = useState('home');
+  const [showAccessibilitySettings, setShowAccessibilitySettings] = useState(false);
 
   // Simulate data loading with useEffect
   useEffect(() => {
@@ -253,35 +255,56 @@ const Dashboard = ({ user }) => {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'home' ? 'active' : ''}`}
-          onClick={() => setActiveTab('home')}
-        >
-          <FaHome /> Home
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'courses' ? 'active' : ''}`}
-          onClick={() => setActiveTab('courses')}
-        >
-          <FaBook /> Courses
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'quizzes' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quizzes')}
-        >
-          <FaQuestionCircle /> Quizzes
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'help' ? 'active' : ''}`}
-          onClick={() => setActiveTab('help')}
-        >
-          <FaHeadset /> Get Help
-        </button>
-      </div>
-
-      <div className="dashboard-content">
+      <div className="dashboard">
+        <div className="dashboard-tabs">
+          <button 
+            className={`tab-button ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveTab('home')}
+          >
+            <FaHome /> Home
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'courses' ? 'active' : ''}`}
+            onClick={() => setActiveTab('courses')}
+          >
+            <FaBook /> Courses
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'quizzes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('quizzes')}
+          >
+            <FaQuestionCircle /> Quizzes
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'help' ? 'active' : ''}`}
+            onClick={() => setActiveTab('help')}
+          >
+            <FaHeadset /> Help
+          </button>
+          <button 
+            className={`tab-button accessibility-button`}
+            onClick={() => setShowAccessibilitySettings(true)}
+          >
+            <FaUniversalAccess /> Accessibility
+          </button>
+          {userProfile.role === 'teacher' && (
+            <Link to="/teacher-dashboard" className="tab-button teacher-button">
+              <FaChalkboardTeacher /> Teacher Mode
+            </Link>
+          )}
+        </div>
+        
         {renderTabContent()}
+        
+        {showAccessibilitySettings && (
+          <div className="modal-overlay">
+            <div className="modal-container">
+              <AccessibilitySettings 
+                onClose={() => setShowAccessibilitySettings(false)} 
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

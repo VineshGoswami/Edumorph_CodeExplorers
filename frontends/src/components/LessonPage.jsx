@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getLesson, trackProgress } from '../api';
+import { getLesson, trackProgress, adaptContentCultural, translateContentWithContext } from '../api';
 import useSpeech from '../hooks/useSpeech';
+import useSpeechRecognition from '../hooks/useSpeechRecognition';
+import CulturalAdaptationSettings from './CulturalAdaptationSettings';
+import TranslationSettings from './TranslationSettings';
+import SpeechInputButton from './SpeechInputButton';
 
 /**
  * LessonPage component for displaying and interacting with lesson content
@@ -15,7 +19,26 @@ const LessonPage = () => {
   const [error, setError] = useState('');
   const [currentSection, setCurrentSection] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [adaptedContent, setAdaptedContent] = useState([]);
+  const [userPreferences, setUserPreferences] = useState({
+    adaptationLevel: 'medium',
+    region: 'Punjab',
+    useLocalExamples: true,
+    preferredLanguage: 'en',
+    translationEnabled: false,
+    contextAwareTranslation: true,
+    preserveFormatting: true
+  });
+  const [showSettings, setShowSettings] = useState(false);
+  const [showTranslationSettings, setShowTranslationSettings] = useState(false);
+  const [showSpeechInput, setShowSpeechInput] = useState(false);
+  const [speechInputText, setSpeechInputText] = useState('');
   const { speak, stop, isSpeaking } = useSpeech();
+  const { startListening, stopListening, transcript, isListening } = useSpeechRecognition({
+    language: userPreferences.preferredLanguage === 'en' ? 'en-US' : userPreferences.preferredLanguage,
+    continuous: false,
+    interimResults: true
+  });
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -28,6 +51,13 @@ const LessonPage = () => {
         if (response.data.userProgress) {
           setProgress(response.data.userProgress.progress);
         }
+        
+        // Load user preferences from localStorage
+        const savedPreferences = localStorage.getItem('userPreferences');
+        if (savedPreferences) {
+          const parsedPreferences = JSON.parse(savedPreferences);
+          setUserPreferences(parsedPreferences);
+        }
       } catch (err) {
         console.error('Error fetching lesson:', err);
         setError('Failed to load lesson. Please try again.');
@@ -39,7 +69,11 @@ const LessonPage = () => {
     fetchLesson();
     
     // Cleanup speech on unmount
-    return () => {
+    const toggleTranslationSettings = () => {
+    setShowTranslationSettings(!showTranslationSettings);
+  };
+
+  return () => {
       stop();
     };
   }, [id, stop]);
@@ -64,6 +98,78 @@ const LessonPage = () => {
       }
     }
   }, [currentSection, lesson, progress]);
+  
+  // Apply cultural adaptation and translation when lesson or preferences change
+  useEffect(() => {
+    const processContent = async () => {
+      if (!lesson) return;
+      
+      const sections = lesson.content.split('<section>');
+      const processedSections = [];
+      
+      // Create context object for adaptation and translation
+      const context = {
+        user: {
+          grade: 5, // Default grade level
+          preferred_language: userPreferences.preferredLanguage,
+          region: userPreferences.region,
+          local_examples: userPreferences.useLocalExamples
+        },
+        device: {
+          is_mobile: window.innerWidth < 768
+        },
+        content: {
+          subject: lesson.subject || 'General',
+          adaptation_level: userPreferences.adaptationLevel
+        }
+      };
+      
+      // Process each section (adapt and translate)
+      for (const section of sections) {
+        if (!section.trim()) {
+          processedSections.push('');
+          continue;
+        }
+        
+        try {
+          // First apply cultural adaptation
+          const adaptedResponse = await adaptContentCultural(section, context);
+          let processedContent = adaptedResponse.data.adapted_text;
+          
+          // Then apply translation if enabled
+          if (userPreferences.translationEnabled && 
+              userPreferences.preferredLanguage !== 'en') {
+            try {
+              const translationMethod = userPreferences.contextAwareTranslation ? 
+                translateContentWithContext : null;
+              
+              if (translationMethod) {
+                const translatedResponse = await translationMethod(
+                  processedContent, 
+                  userPreferences.preferredLanguage, 
+                  context, 
+                  'en'
+                );
+                processedContent = translatedResponse.data.translated_text;
+              }
+            } catch (translationErr) {
+              console.error('Translation error:', translationErr);
+              // Continue with adapted but untranslated content
+            }
+          }
+          
+          processedSections.push(processedContent);
+        } catch (err) {
+          console.error('Error processing content:', err);
+          processedSections.push(section); // Fallback to original content
+        }
+      }
+      
+      setAdaptedContent(processedSections);
+    };
+    
+    processContent();
+  }, [lesson, userPreferences]);
 
   const handleNextSection = () => {
     if (!lesson) return;
@@ -99,6 +205,41 @@ const LessonPage = () => {
       speak(textContent);
     }
   };
+  
+  const handleToggleSpeechInput = () => {
+    setShowSpeechInput(!showSpeechInput);
+  };
+  
+  const toggleTranslationSettings = () => {
+    setShowTranslationSettings(!showTranslationSettings);
+  };
+  
+  const handleTranscriptChange = (text) => {
+    setSpeechInputText(text);
+  };
+  
+  const handleTranscriptComplete = (text) => {
+    if (text.trim()) {
+      // Here you could implement different actions based on the speech input
+      // For example, navigate to next/previous section, toggle speech output, etc.
+      
+      // Simple command detection
+      const lowerText = text.toLowerCase();
+      
+      if (lowerText.includes('next') || lowerText.includes('forward')) {
+        handleNextSection();
+      } else if (lowerText.includes('previous') || lowerText.includes('back')) {
+        handlePrevSection();
+      } else if (lowerText.includes('read') || lowerText.includes('speak')) {
+        handleSpeakContent();
+      } else if (lowerText.includes('finish') || lowerText.includes('complete')) {
+        handleFinishLesson();
+      }
+      
+      // Clear the speech input text after processing
+      setSpeechInputText('');
+    }
+  };
 
   const handleFinishLesson = () => {
     // Mark lesson as 100% complete if user is authenticated
@@ -126,8 +267,17 @@ const LessonPage = () => {
 
   // Split content into sections
   const sections = lesson.content.split('<section>');
-  const currentContent = sections[currentSection];
+  // Use adapted content if available, otherwise use original
+  const currentContent = adaptedContent.length > currentSection ? adaptedContent[currentSection] : sections[currentSection];
   const isLastSection = currentSection === sections.length - 1;
+  
+  const handlePreferencesUpdated = (newPreferences) => {
+    setUserPreferences(prev => {
+      const updatedPreferences = { ...prev, ...newPreferences };
+      localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
+      return updatedPreferences;
+    });
+  };
 
   return (
     <div className="lesson-page-container">
@@ -180,7 +330,64 @@ const LessonPage = () => {
           >
             {isSpeaking ? 'Stop Reading' : 'Read Aloud'}
           </button>
+          
+          <button
+            onClick={handleToggleSpeechInput}
+            className={`speech-input-toggle ${showSpeechInput ? 'active' : ''}`}
+          >
+            {showSpeechInput ? 'Hide Voice Commands' : 'Voice Commands'}
+          </button>
+          
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="settings-button"
+          >
+            {showSettings ? 'Hide Settings' : 'Cultural Settings'}
+          </button>
+          
+          <button
+            onClick={toggleTranslationSettings}
+            className="settings-button translation-button"
+          >
+            {showTranslationSettings ? 'Hide Translation' : 'Translation Settings'}
+          </button>
         </div>
+        
+        {showSpeechInput && (
+          <div className="speech-input-section">
+            <SpeechInputButton
+              onTranscriptChange={handleTranscriptChange}
+              onTranscriptComplete={handleTranscriptComplete}
+              language={userPreferences.preferredLanguage === 'en' ? 'en-US' : userPreferences.preferredLanguage}
+              buttonText="Speak Command"
+              listeningText="Listening for command..."
+            />
+            <div className="speech-commands-help">
+              <h4>Available Voice Commands:</h4>
+              <ul>
+                <li>"Next" or "Forward" - Go to next section</li>
+                <li>"Previous" or "Back" - Go to previous section</li>
+                <li>"Read" or "Speak" - Read the current section aloud</li>
+                <li>"Finish" or "Complete" - Finish the lesson</li>
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {showSettings && (
+          <CulturalAdaptationSettings 
+            userPreferences={userPreferences}
+            onPreferencesUpdated={handlePreferencesUpdated}
+          />
+        )}
+        
+        {showTranslationSettings && (
+          <TranslationSettings 
+            initialPreferences={userPreferences}
+            onClose={toggleTranslationSettings}
+            onPreferencesUpdated={handlePreferencesUpdated}
+          />
+        )}
         
         <div 
           className="content-html"
