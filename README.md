@@ -76,84 +76,7 @@ The application consists of four main components:
    - ML Service: `cd ml-service && uvicorn app:app --host 0.0.0.0 --port 8000`
    - MCP Service: `cd mcp-service && uvicorn app:app --host 0.0.0.0 --port 8100`
 
-## Deployment
 
-The application is configured for deployment on the following platforms:
-
-- **Frontend**: Vercel
-- **Backend**: Render
-- **ML Service**: Render
-- **MCP Service**: Render
-- **Database**: MongoDB Atlas
-
-### Deployment Steps
-
-#### 1. Frontend Deployment (Vercel)
-
-1. Log in to your Vercel account
-2. Import your GitHub repository
-3. Configure the project:
-   - Root Directory: `frontends`
-   - Build Command: `npm run build`
-   - Output Directory: `build`
-4. Add environment variables:
-   - `REACT_APP_API_URL`: URL of your deployed backend API
-5. Deploy the project
-
-#### 2. Backend Deployment (Render)
-
-1. Log in to your Render account
-2. Create a new Web Service
-3. Connect your GitHub repository
-4. Configure the service:
-   - Name: `edumorph-backend`
-   - Root Directory: `backend`
-   - Runtime: Node
-   - Build Command: `npm install`
-   - Start Command: `node server.js`
-5. Add environment variables from `.env.example`
-6. Deploy the service
-
-#### 3. ML Service Deployment (Render)
-
-1. Create a new Web Service in Render
-2. Configure the service:
-   - Name: `edumorph-ml-service`
-   - Root Directory: `ml-service`
-   - Runtime: Python 3
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app:app --host 0.0.0.0 --port $PORT`
-3. Deploy the service
-
-#### 4. MCP Service Deployment (Render)
-
-1. Create a new Web Service in Render
-2. Configure the service:
-   - Name: `edumorph-mcp-service`
-   - Root Directory: `mcp-service`
-   - Runtime: Python 3
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app:app --host 0.0.0.0 --port $PORT`
-3. Add environment variables:
-   - `OPENAI_API_KEY`: Your OpenAI API key
-4. Deploy the service
-
-#### 5. MongoDB Atlas Setup
-
-1. Create a MongoDB Atlas account
-2. Create a new cluster
-3. Set up database access (username and password)
-4. Configure network access (IP whitelist or allow access from anywhere)
-5. Get your connection string and update the `MONGO_URI` environment variable in the backend service
-
-### Deployment URLs
-
-- Frontend: https://edumorph-frontend.vercel.app
-- Backend API: https://edumorph-backend.onrender.com
-- ML Service: https://edumorph-ml-service.onrender.com
-- MCP Service: https://edumorph-mcp-service.onrender.com
-
-## Testing
 
 Refer to the `TESTING.md` file for a comprehensive testing checklist to verify the deployment.
 
@@ -172,4 +95,6 @@ Common deployment issues and their solutions:
 
 ## License
 
-This project is licensed under the terms found in the LICENSE file.
+This project is licensed under the terms found in the LICENSE file.![WhatsApp Image 2025-08-21 at 10 59 58_aa3668c1](https://github.com/user-attachments/assets/8696eec9-6761-45e9-b82e-85a7ed11c261)  <img width="1688" height="872" alt="image" src="https://github.com/user-attachments/assets/ca6374f5-4015-474a-b1d5-13074f52330f" />
+<img width="1419" height="796" alt="image" src="https://github.com/user-attachments/assets/bb374aac-06f5-49bf-9ee2-e5f9f8b4711e" />
+
