@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaHome, FaBook, FaQuestionCircle, FaHeadset, FaUniversalAccess, FaChalkboardTeacher } from 'react-icons/fa';
 import AccessibilitySettings from './AccessibilitySettings';
+import { useTheme } from '../App';
 import '../styles/Dashboard.css';
+import '../styles/animations.css';
+import ProgressAnimation from './ProgressAnimation';
+import LessonFilters from './LessonFilters';
 
 // Mock data for lessons
 const mockLessons = [
@@ -73,11 +77,25 @@ const mockUser = {
  */
 const Dashboard = ({ user }) => {
   const [lessons, setLessons] = useState(mockLessons);
+  const [filteredLessons, setFilteredLessons] = useState(mockLessons);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userProfile, setUserProfile] = useState(user || mockUser);
   const [activeTab, setActiveTab] = useState('home');
   const [showAccessibilitySettings, setShowAccessibilitySettings] = useState(false);
+  const [animatedElements, setAnimatedElements] = useState([]);
+  const [filters, setFilters] = useState({
+    category: 'all',
+    difficulty: 'all',
+    searchTerm: '',
+    sortBy: 'newest'
+  });
+  const { theme } = useTheme();
+  
+  // Refs for animation elements
+  const dashboardRef = useRef(null);
+  const headerRef = useRef(null);
+  const lessonsRef = useRef(null);
 
   // Simulate data loading with useEffect
   useEffect(() => {
@@ -85,10 +103,131 @@ const Dashboard = ({ user }) => {
     setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
+      
+      // Start animations after loading
+      animateElements();
     }, 500);
-    
     return () => clearTimeout(timer);
   }, []);
+  
+  // Animation observer setup
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in-animation');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, options);
+    
+    // Get all animatable elements
+    const elements = document.querySelectorAll('.animatable');
+    elements.forEach(el => {
+      observer.observe(el);
+    });
+    
+    return () => {
+      elements.forEach(el => {
+        observer.unobserve(el);
+      });
+    };
+  }, [isLoading]);
+  
+  // Function to trigger animations
+  const animateElements = () => {
+    if (headerRef.current) {
+      headerRef.current.classList.add('slide-in-animation');
+    }
+    
+    // Staggered animation for lesson cards
+    const lessonCards = document.querySelectorAll('.lesson-card');
+    lessonCards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add('scale-in-animation');
+      }, 100 * index);
+    });
+  };
+
+  // Placeholder for backend data fetch (always call hooks at the top level)
+  useEffect(() => {
+    // TODO: Replace mockLessons with API call to backend
+    // Example:
+    // fetch('/api/lessons').then(res => res.json()).then(data => setLessons(data));
+  }, []);
+  
+  // Apply filters when filter state changes
+  useEffect(() => {
+    if (lessons.length === 0) return;
+    
+    let result = [...lessons];
+    
+    // Apply category filter
+    if (filters.category !== 'all') {
+      result = result.filter(lesson => lesson.category === filters.category);
+    }
+    
+    // Apply difficulty filter
+    if (filters.difficulty !== 'all') {
+      result = result.filter(lesson => lesson.difficulty === filters.difficulty);
+    }
+    
+    // Apply search term
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      result = result.filter(lesson => 
+        lesson.title.toLowerCase().includes(searchLower) || 
+        lesson.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply sorting
+    switch (filters.sortBy) {
+      case 'newest':
+        // Since we don't have createdAt in our mock data, we'll just use the current order
+        break;
+      case 'oldest':
+        result = [...result].reverse();
+        break;
+      case 'progress':
+        result.sort((a, b) => {
+          const progressA = a.userProgress?.progress || 0;
+          const progressB = b.userProgress?.progress || 0;
+          return progressB - progressA;
+        });
+        break;
+      case 'alphabetical':
+        result.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      default:
+        break;
+    }
+    
+    // Add animation class to filtered results
+    const animatedResults = result.map(lesson => ({
+      ...lesson,
+      animationClass: 'filter-change-animation'
+    }));
+    
+    setFilteredLessons(animatedResults);
+    
+    // Remove animation class after animation completes
+    const timer = setTimeout(() => {
+      setFilteredLessons(result);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [filters, lessons]);
+  
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
   // Calculate overall progress
   const calculateOverallProgress = () => {
@@ -101,6 +240,7 @@ const Dashboard = ({ user }) => {
     return Math.round((completedLessons / lessons.length) * 100);
   };
 
+
   if (isLoading) {
     return <div className="loading">Loading dashboard...</div>;
   }
@@ -109,53 +249,70 @@ const Dashboard = ({ user }) => {
     return <div className="error-container">{error}</div>;
   }
 
+  // Fallback: If no lessons, show a message
+  if (!lessons || lessons.length === 0) {
+    return <div className="dashboard-fallback">No lessons found. Please check your connection or contact support.</div>;
+  }
+
+  // Debug: Log lessons and user
+  console.log('Dashboard lessons:', lessons);
+  console.log('Dashboard user:', userProfile);
+
   const renderTabContent = () => {
     switch(activeTab) {
       case 'home':
         return (
           <>
-            <div className="dashboard-header">
-              <h1>Welcome, {userProfile.name || 'Learner'}!</h1>
+            <div className="dashboard-header animatable" ref={headerRef}>
+              <h1 className="welcome-title">Welcome, {userProfile.name || 'Learner'}!</h1>
               <div className="overall-progress">
-                <h3>Overall Progress</h3>
+                <div className="progress-header">
+                  <h3>Overall Progress</h3>
+                  <ProgressAnimation progress={calculateOverallProgress()} size={80} strokeWidth={6} />
+                </div>
                 <div className="progress-bar">
                   <div 
                     className="progress-fill" 
                     style={{ width: `${calculateOverallProgress()}%` }}
+                    data-progress={calculateOverallProgress()}
                   ></div>
                 </div>
-                <span>{calculateOverallProgress()}% Complete</span>
+                <span className="progress-text">{calculateOverallProgress()}% Complete</span>
               </div>
             </div>
             <section className="recommended-lessons">
               <h2>Recommended for You</h2>
-              <div className="lessons-grid">
+              <div className="lessons-grid" ref={lessonsRef}>
                 {lessons
                   .filter(lesson => 
                     !lesson.userProgress || lesson.userProgress.progress < 100
                   )
                   .slice(0, 3)
                   .map(lesson => (
-                    <div className="lesson-card" key={lesson.id}>
-                      <h3>{lesson.title}</h3>
-                      <p>{lesson.description}</p>
+                    <div className="lesson-card animatable glow-animation" key={lesson.id}>
+                      <h3 className="lesson-title">{lesson.title}</h3>
+                      <p className="lesson-description">{lesson.description}</p>
                       <div className="lesson-meta">
                         <span className="difficulty">{lesson.difficulty}</span>
                         <span className="duration">{lesson.estimatedTime} min</span>
                       </div>
                       <div className="lesson-progress">
+                        <div className="lesson-progress-animation">
+                          <ProgressAnimation progress={lesson.userProgress?.progress || 0} size={60} strokeWidth={4} />
+                        </div>
                         <div className="progress-bar">
                           <div 
                             className="progress-fill" 
                             style={{ 
                               width: `${lesson.userProgress?.progress || 0}%` 
                             }}
+                            data-progress={lesson.userProgress?.progress || 0}
                           ></div>
                         </div>
-                        <span>{lesson.userProgress?.progress || 0}%</span>
+                        <span className="progress-text">{lesson.userProgress?.progress || 0}%</span>
                       </div>
-                      <Link to={`/lessons/${lesson.id}`} className="lesson-button">
-                        {lesson.userProgress?.progress ? 'Continue' : 'Start'}
+                      <Link to={`/lessons/${lesson.id}`} className={`lesson-button ${lesson.userProgress?.progress === 100 ? 'completed-animation' : 'pulse-animation'}`}>
+                        {lesson.userProgress?.progress === 100 ? 'Completed' : lesson.userProgress?.progress ? 'Continue' : 'Start'}
                       </Link>
                     </div>
                   ))}
@@ -167,11 +324,25 @@ const Dashboard = ({ user }) => {
         return (
           <section className="all-lessons">
             <h2>All Courses</h2>
+            <LessonFilters onFilterChange={handleFilterChange} />
             <div className="lessons-list">
-              {lessons.length === 0 ? (
-                <p>No courses available yet.</p>
+              {filteredLessons.length === 0 ? (
+                <div className="no-results">
+                  <p>No courses match your current filters. Try adjusting your search criteria.</p>
+                  <button 
+                    className="reset-filters-button"
+                    onClick={() => handleFilterChange({
+                      category: 'all',
+                      difficulty: 'all',
+                      searchTerm: '',
+                      sortBy: 'newest'
+                    })}
+                  >
+                    Reset Filters
+                  </button>
+                </div>
               ) : (
-                lessons.map(lesson => (
+                filteredLessons.map(lesson => (
                   <div className="lesson-list-item" key={lesson.id}>
                     <div className="lesson-info">
                       <h3>{lesson.title}</h3>
@@ -254,8 +425,8 @@ const Dashboard = ({ user }) => {
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard">
+    <div className={`dashboard-container ${theme}-theme`}>
+      <div className="dashboard" ref={dashboardRef}>
         <div className="dashboard-tabs">
           <button 
             className={`tab-button ${activeTab === 'home' ? 'active' : ''}`}

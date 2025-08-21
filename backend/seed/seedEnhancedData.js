@@ -7,8 +7,15 @@ import Progress from '../src/models/progress.js';
 dotenv.config();
 
 async function run() {
+
   console.log('Connecting to:', process.env.MONGO_URI);
   await mongoose.connect(process.env.MONGO_URI, { dbName: 'edumorph' });
+
+  // Clear existing data to avoid duplicates
+  await User.deleteMany({});
+  await Lesson.deleteMany({});
+  await Progress.deleteMany({});
+  console.log('✅ Cleared users, lessons, and progress collections');
 
   // Add more lessons with enhanced content
   const enhancedLessons = [
@@ -93,7 +100,7 @@ async function run() {
     {
       name: 'Sarah Johnson',
       email: 'sarah@example.com',
-      passwordHash: '$2a$10$XHvjKGhEktF1jNDI7bZwVeIf1O1mXRJMJL7/7e3jZQ5vYzM.BxD2W', // 'password123'
+  passwordHash: '$2a$10$t5WbwKAoROAgJNnvK.SrZefgi8XisLnBQZubaH3zqkU36OVgMy8yG', // 'password123'
       preferredLanguage: 'en',
       region: 'California',
       grade: 6,
@@ -103,7 +110,7 @@ async function run() {
     {
       name: 'Michael Chen',
       email: 'michael@example.com',
-      passwordHash: '$2a$10$XHvjKGhEktF1jNDI7bZwVeIf1O1mXRJMJL7/7e3jZQ5vYzM.BxD2W',
+  passwordHash: '$2a$10$t5WbwKAoROAgJNnvK.SrZefgi8XisLnBQZubaH3zqkU36OVgMy8yG',
       preferredLanguage: 'en',
       region: 'New York',
       grade: 7,
@@ -113,7 +120,7 @@ async function run() {
     {
       name: 'Dr. Emily Rodriguez',
       email: 'emily@example.com',
-      passwordHash: '$2a$10$XHvjKGhEktF1jNDI7bZwVeIf1O1mXRJMJL7/7e3jZQ5vYzM.BxD2W',
+  passwordHash: '$2a$10$t5WbwKAoROAgJNnvK.SrZefgi8XisLnBQZubaH3zqkU36OVgMy8yG',
       preferredLanguage: 'es',
       region: 'Texas',
       learningStyle: 'auditory',
@@ -122,7 +129,7 @@ async function run() {
     {
       name: 'Admin User',
       email: 'admin@edumorph.com',
-      passwordHash: '$2a$10$XHvjKGhEktF1jNDI7bZwVeIf1O1mXRJMJL7/7e3jZQ5vYzM.BxD2W',
+  passwordHash: '$2a$10$t5WbwKAoROAgJNnvK.SrZefgi8XisLnBQZubaH3zqkU36OVgMy8yG',
       preferredLanguage: 'en',
       region: 'Global',
       role: 'teacher'

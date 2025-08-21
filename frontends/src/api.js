@@ -7,7 +7,7 @@ import {
   isOnline 
 } from './utils/offlineStorage';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -32,8 +32,8 @@ api.interceptors.request.use(
 export const login = (email, password) => 
   api.post('/auth/login', { email, password });
 
-export const register = (name, email, password) => 
-  api.post('/auth/register', { name, email, password });
+export const register = (name, email, password, preferredLanguage = 'en', region = 'Punjab', grade = 5) => 
+  api.post('/auth/register', { name, email, password, preferredLanguage, region, grade });
 
 // User API calls
 export const getCurrentUser = () => 

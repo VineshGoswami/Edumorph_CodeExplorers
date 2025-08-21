@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../App';
+import ThemeToggle from './ThemeToggle';
 import '../styles/Navigation.css';
 
 const Navigation = () => {
@@ -25,14 +27,18 @@ const Navigation = () => {
     return location.pathname === path;
   };
 
+  const { theme } = useTheme();
+  
   return (
-    <nav className="main-navigation">
+    <nav className={`main-navigation ${theme}-theme`}>
       <div className="nav-container">
         <div className="nav-logo">
           <Link to="/dashboard" onClick={closeMobileMenu}>
             <span className="logo-text">EduMorph</span>
           </Link>
         </div>
+        
+        <ThemeToggle />
 
         <button 
           className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`} 

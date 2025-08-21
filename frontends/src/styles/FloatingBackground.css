@@ -88,16 +88,17 @@ body.theme-dark-sea {
   animation-delay: 4s;
 }
 
-/* Floating animation */
+/* Floating animation - optimized for performance */
 @keyframes float-animation {
   0% {
     transform: translate(0, 0) rotate(0deg);
+    will-change: transform;
   }
   25% {
-    transform: translate(5%, 10%) rotate(5deg);
+    transform: translate(2%, 4%) rotate(2deg);
   }
   50% {
-    transform: translate(10%, 5%) rotate(10deg);
+    transform: translate(4%, 2%) rotate(4deg);
   }
   75% {
     transform: translate(5%, -5%) rotate(5deg);

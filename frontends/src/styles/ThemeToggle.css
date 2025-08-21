@@ -1,0 +1,76 @@
+/* Theme Toggle Styles */
+
+.theme-toggle-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  outline: none;
+}
+
+.toggle-track {
+  width: 50px;
+  height: 24px;
+  padding: 0;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-dark);
+  border: 2px solid var(--accent-color);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.theme-toggle.light .toggle-track {
+  background-color: var(--light-color);
+}
+
+.toggle-indicator {
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  transform: translateX(0);
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle.light .toggle-indicator {
+  transform: translateX(26px);
+  background-color: var(--primary-color);
+}
+
+.toggle-icon {
+  font-size: 12px;
+  line-height: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Animation for the toggle */
+.theme-toggle:hover .toggle-indicator {
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+.theme-toggle:active .toggle-indicator {
+  transform: scale(0.9);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .toggle-indicator,
+  .toggle-icon {
+    transition: none;
+  }
+}

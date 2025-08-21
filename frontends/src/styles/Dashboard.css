@@ -6,6 +6,7 @@
   padding: 1rem;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
 }
 
 .dashboard-container::-webkit-scrollbar {
@@ -35,6 +36,13 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.light-theme .dashboard-tabs {
+  background-color: rgba(240, 230, 255, 0.7);
+  border: 1px solid var(--border-color);
 }
 
 .tab-button {
@@ -50,6 +58,23 @@
   background-color: transparent;
   color: var(--text-color);
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.tab-button:hover::before {
+  left: 100%;
 }
 
 .tab-button:hover {
@@ -97,6 +122,11 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.light-theme .modal-overlay {
+  background-color: rgba(75, 0, 130, 0.5);
 }
 
 .modal-container {
@@ -188,6 +218,33 @@
   box-shadow: 0 4px 12px rgba(80, 227, 194, 0.2);
 }
 
+.lesson-button:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(80, 227, 194, 0.3);
+}
+
+.lesson-button.pulse-animation:hover {
+  animation: pulse 1.5s infinite;
+}
+
+.lesson-button.completed-animation {
+  background-color: #2e7d32;
+  position: relative;
+  overflow: hidden;
+}
+
+.lesson-button.completed-animation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShine 2s infinite;
+}
+
 /* Help Center */
 .help-center {
   background-color: rgba(20, 20, 30, 0.7);
@@ -256,6 +313,50 @@
   }
 }
 
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  perspective: 1000px;
+}
+
+.no-results {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  margin-top: 1.5rem;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.light-theme .no-results {
+  background-color: rgba(240, 230, 255, 0.7);
+}
+
+.no-results p {
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.reset-filters-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--accent-color);
+  color: var(--text-color-inverted);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.reset-filters-button:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(80, 227, 194, 0.3);
+}
+
 /* Dark Theme Overrides for Dashboard */
 .dashboard-container {
   color: var(--text-color);
@@ -284,6 +385,36 @@
 .lesson-card {
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.5s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.lesson-card.animatable {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+
+.lesson-card.animated {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.lesson-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(80, 227, 194, 0.2);
+  border-color: var(--accent-color);
+}
+
+.light-theme .lesson-card {
+  background-color: rgba(240, 230, 255, 0.7);
+  box-shadow: 0 5px 15px rgba(75, 0, 130, 0.1);
 }
 
 .lesson-card h3 {
@@ -309,12 +440,54 @@
   color: var(--text-color);
 }
 
+.lesson-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lesson-progress-animation {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0;
+}
+
 .progress-bar {
   background-color: rgba(255, 255, 255, 0.1);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  position: relative;
 }
 
 .progress-fill {
   background-color: var(--accent-color);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.5s cubic-bezier(0.1, 0.5, 0.1, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .dashboard-header {
@@ -325,6 +498,17 @@
   border: 1px solid var(--border-color);
   box-shadow: var(--box-shadow);
   margin-bottom: 2rem;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.dashboard-header.animatable {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.dashboard-header.animated {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .dashboard-header h1 {
@@ -337,6 +521,20 @@
   padding: 1.5rem;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
+  transition: all 0.5s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.light-theme .overall-progress {
+  background-color: rgba(240, 230, 255, 0.7);
+  box-shadow: 0 5px 15px rgba(75, 0, 130, 0.1);
 }
 
 .overall-progress h3 {
