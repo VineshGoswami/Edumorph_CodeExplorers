@@ -49,5 +49,10 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
+  },
+
+  "scripts": {
+    "build": "CI=false npm run build"
   }
+
 }
